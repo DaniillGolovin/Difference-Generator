@@ -2,18 +2,18 @@
 
 namespace Differ\Differ;
 
-function readFile($filePath)
+function readFile(string $filePath)
 {
     $path = realpath($filePath);
 
     if (!file_exists($path)) {
-        throw new \Exception('The file {$path} does not exists.\n');
+        throw new \Exception("The file {$filePath} does not exists.\n");
     }
 
     return file_get_contents($path);
 }
 
-function genDiff($firstFilePath, $secondFilePath)
+function genDiff(string $firstFilePath, string $secondFilePath)
 {
     $firstContent = readFile($firstFilePath);
     $secondContent = readFile($secondFilePath);
@@ -21,6 +21,11 @@ function genDiff($firstFilePath, $secondFilePath)
     $firstData = json_decode($firstContent, true);
     $secondData = json_decode($secondContent, true);
 
+    return calculate($firstData, $secondData);
+}
+
+function calculate(array $firstData, array $secondData)
+{
     $mergedData = array_merge($firstData, $secondData);
 
     ksort($mergedData);
@@ -37,22 +42,27 @@ function genDiff($firstFilePath, $secondFilePath)
         }
         if (array_key_exists($key, $secondData) && array_key_exists($key, $firstData)) {
             if ($value === $firstData[$key]) {
-                $result["   {$key}"] = $value;
+                $result["    {$key}"] = $value;
             } else {
-                $result[" - {$key}"] = $firstData[$key];
-                $result[" + {$key}"] = $value;
+                $result["  - {$key}"] = $firstData[$key];
+                $result["  + {$key}"] = $value;
             }
         } elseif (array_key_exists($key, $firstData) && !array_key_exists($key, $secondData)) {
-            $result[" - {$key}"] = $value;
+            $result["  - {$key}"] = $value;
         } else {
-            $result[" + {$key}"] = $value;
+            $result["  + {$key}"] = $value;
         }
     }
 
+    return render($result);
+}
+
+function render(array $data)
+{
     $string = '';
 
-    foreach ($result as $key => $value) {
-        $string .= "{$key} => {$value}\n";
+    foreach ($data as $key => $value) {
+        $string .= "{$key}: {$value}\n";
     }
 
     return "{\n{$string}}\n";
