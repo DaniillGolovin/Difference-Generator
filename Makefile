@@ -17,4 +17,4 @@ test:
 	composer run-script phpunit tests
 
 test-coverage:
-	composer run-script phpunit tests -- --coverage-clover build/logs/clover.xml
+	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-clover tests/build/logs/clover.xml
