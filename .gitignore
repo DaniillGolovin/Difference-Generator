@@ -1,2 +1,7 @@
 /vendor/
 .idea
+/build/
+*.cache
+testdox.txt
+clover.xml
+/xml-coverage/
