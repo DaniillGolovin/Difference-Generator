@@ -1,0 +1,27 @@
+{
+    "name": "daniillgolovin/difrences-files",
+    "bin": [
+        "bin/gendiff"
+    ],
+    "description": "Generate diff",
+    "type": "project",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "DaniillGolovin",
+            "email": "daniilgolovin656@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.3",
+        "docopt/docopt": "^1.0"
+    },
+    "scripts": {
+        "phpcs": "phpcs"
+    },
+    "license": "MIT",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.10",
+        "phpstan/phpstan": "^1.11"
+    }
+}
