@@ -24,7 +24,8 @@
     ],
     "require": {
         "php": ">=7.4.3",
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "symfony/yaml": "^5.2"
     },
     "scripts": {
         "phpcs": "phpcs",
