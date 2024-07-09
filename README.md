@@ -27,4 +27,8 @@ $ bin/gendiff --format plain pathToFile1 pathTofile2
 $ composer global require daniillgolovin/difrences-files
 ```
 
-[![asciicast](https://asciinema.org/a/UE8ZFrteAHx1hIEHoYrWvHtsu.svg)](https://asciinema.org/a/UE8ZFrteAHx1hIEHoYrWvHtsu)
+Различия между файлами (JSON)
+[![asciicast](https://asciinema.org/a/VFuhbZbIbB0HfzQLpaaqAXcYQ.svg)](https://asciinema.org/a/VFuhbZbIbB0HfzQLpaaqAXcYQ)
+
+Различия между файлами (YML)
+[![asciicast](https://asciinema.org/a/IGoMG2HCp6yb0sJ0B1Ca9WA7g.svg)](https://asciinema.org/a/IGoMG2HCp6yb0sJ0B1Ca9WA7g)
