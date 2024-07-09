@@ -24,7 +24,7 @@
         }
     ],
     "require": {
-        "php": ">=7.4.3",
+        "php": ">=8.1.0",
         "docopt/docopt": "^1.0",
         "symfony/yaml": "^5.2"
     },
@@ -35,7 +35,6 @@
     "license": "MIT",
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.10",
-        "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^9"
     }
 }
