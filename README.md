@@ -41,3 +41,6 @@ $ composer global require daniillgolovin/difrences-files
 
 Сравнение файлов json/yaml в формате (PLAIN)
 [![asciicast](https://asciinema.org/a/Gx4FhGD45KsO1jtRC9hEXuCoZ.svg)](https://asciinema.org/a/Gx4FhGD45KsO1jtRC9hEXuCoZ)
+
+Сравнение файлов json/yaml в формате (JSON)
+[![asciicast](https://asciinema.org/a/RE3aATkjC8V4WHn4ZlrRv6bFL.svg)](https://asciinema.org/a/RE3aATkjC8V4WHn4ZlrRv6bFL)
