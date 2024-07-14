@@ -32,3 +32,9 @@ $ composer global require daniillgolovin/difrences-files
 
 Различия между файлами (YML)
 [![asciicast](https://asciinema.org/a/IGoMG2HCp6yb0sJ0B1Ca9WA7g.svg)](https://asciinema.org/a/IGoMG2HCp6yb0sJ0B1Ca9WA7g)
+
+Различия между вложенными файлами (JSON)
+[![asciicast](https://asciinema.org/a/XRkHZSchYetTA57ynC8x75HI1.svg)](https://asciinema.org/a/XRkHZSchYetTA57ynC8x75HI1)
+
+Различия между вложенными файлами (YAML)
+[![asciicast](https://asciinema.org/a/gBM9d0uB5jLgkWgyOtmW78q7V.svg)](https://asciinema.org/a/gBM9d0uB5jLgkWgyOtmW78q7V)
