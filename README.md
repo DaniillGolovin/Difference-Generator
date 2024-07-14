@@ -38,3 +38,6 @@ $ composer global require daniillgolovin/difrences-files
 
 Различия между вложенными файлами (YAML)
 [![asciicast](https://asciinema.org/a/gBM9d0uB5jLgkWgyOtmW78q7V.svg)](https://asciinema.org/a/gBM9d0uB5jLgkWgyOtmW78q7V)
+
+Сравнение файлов json/yaml в формате (PLAIN)
+[![asciicast](https://asciinema.org/a/Gx4FhGD45KsO1jtRC9hEXuCoZ.svg)](https://asciinema.org/a/Gx4FhGD45KsO1jtRC9hEXuCoZ)
