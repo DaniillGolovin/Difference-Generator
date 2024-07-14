@@ -9,28 +9,30 @@ use function Differ\Formatters\format;
 function readFile(string $filePath): string
 {
     if (!file_exists($filePath)) {
-        throw new \Exception("The file {$filePath} does not exists.\n");
+        throw new \Exception("The file {$filePath} does not exists.");
     }
 
     return (string) file_get_contents($filePath);
 }
 
-function getData(string $path): object
+function getType(string $path): string
 {
-    $type = pathinfo($path, PATHINFO_EXTENSION);
-    return parse(readFile($path), $type);
+    return pathinfo($path, PATHINFO_EXTENSION);
 }
 
 function genDiff(string $firstFilePath, string $secondFilePath, string $format = 'stylish'): string
 {
-    $firstData = getData($firstFilePath);
-    $secondData = getData($secondFilePath);
+    $firstData = readFile($firstFilePath);
+    $secondData = readFile($secondFilePath);
 
-    $ast = genAst($firstData, $secondData);
-    return format($ast, $format);
+    $parseFirstData = parse($firstData, getType($firstFilePath));
+    $parseSecondData = parse($secondData, getType($secondFilePath));
+
+    $node = makeNode($parseFirstData, $parseSecondData);
+    return format($node, $format);
 }
 
-function genAst(object $firstData, object $secondData): array
+function makeNode(object $firstData, object $secondData): array
 {
     $firstDataArray = (array) $firstData;
     $secondDataArray = (array) $secondData;
@@ -38,51 +40,45 @@ function genAst(object $firstData, object $secondData): array
     $unionKeys = array_keys(array_merge($firstDataArray, $secondDataArray));
     $sortedKeys = array_values(sortBy($unionKeys, fn($key) => $key));
 
-    $ast = array_reduce($sortedKeys, function ($acc, $item) use ($firstDataArray, $secondDataArray): array {
-        return[...$acc, diffData($item, $firstDataArray, $secondDataArray)];
-    }, []);
-
-    return $ast;
-}
-
-function diffData(string $item, array $data1, array $data2): array
-{
-    if (!array_key_exists($item, $data1)) {
+    $node = array_map(function ($key) use ($firstDataArray, $secondDataArray): array {
+        if (!array_key_exists($key, $firstDataArray)) {
+            return [
+                'key' => $key,
+                'type' => 'added',
+                'oldValue' => null,
+                'newValue' => $secondDataArray[$key],
+            ];
+        }
+        if (!array_key_exists($key, $secondDataArray)) {
+            return [
+                'key' => $key,
+                'type' => 'removed',
+                'oldValue' => null,
+                'newValue' => $firstDataArray[$key],
+            ];
+        }
+        if (is_object($firstDataArray[$key]) && is_object($secondDataArray[$key])) {
+            return [
+                'key' => $key,
+                'type' => 'complex',
+                'children' => makeNode($firstDataArray[$key], $secondDataArray[$key]),
+            ];
+        }
+        if ($firstDataArray[$key] === $secondDataArray[$key]) {
+            return [
+                'key' => $key,
+                'type' => 'not updated',
+                'oldValue' => $firstDataArray[$key],
+                'newValue' => $secondDataArray[$key],
+            ];
+        }
         return [
-            'key' => $item,
-            'type' => 'added',
-            'oldValue' => null,
-            'newValue' => $data2[$item],
-        ];
-    }
-    if (!array_key_exists($item, $data2)) {
-        return [
-            'key' => $item,
-            'type' => 'removed',
-            'oldValue' => null,
-            'newValue' => $data1[$item],
-        ];
-    }
-    if (is_object($data1[$item]) && is_object($data2[$item])) {
-        return [
-            'key' => $item,
-            'type' => 'complex',
-            'children' => genAst($data1[$item], $data2[$item]),
-        ];
-    }
-    if ($data1[$item] === $data2[$item]) {
-        return [
-            'key' => $item,
-            'type' => 'not updated',
-            'oldValue' => $data1[$item],
-            'newValue' => $data2[$item],
-        ];
-    } else {
-        return [
-            'key' => $item,
+            'key' => $key,
             'type' => 'updated',
-            'oldValue' => $data1[$item],
-            'newValue' => $data2[$item],
+            'oldValue' => $firstDataArray[$key],
+            'newValue' => $secondDataArray[$key],
         ];
-    }
+    }, $sortedKeys);
+
+    return $node;
 }
