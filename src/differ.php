@@ -5,8 +5,6 @@ namespace Differ\Differ;
 use function Differ\Parsers\parse;
 use function Differ\Formater\format;
 
-use function Funct\Collection\union;
-
 function readFile(string $filePath)
 {
     $path = realpath($filePath);
@@ -35,38 +33,23 @@ function genDiff(string $firstFilePath, string $secondFilePath, $format = 'styli
 
 function genAst($firstData, $secondData)
 {
-    //Todo: возможно тут возвращать принудительно массив вместо объекта
     $firstData = (array) $firstData;
     $secondData = (array) $secondData;
 
-    //print_r($firstData);//die;
-
-    //$union = union(array_keys($firstData), array_keys($secondData));
     $union = array_keys(array_merge($firstData, $secondData));
-    // print_r($union);//die;
-    //$union = array_merge($firstData, $secondData);
-
-
     sort($union);
-
-    // print_r($union);die;
 
     $ast = array_reduce($union, function ($acc, $item) use ($firstData, $secondData) {
         $acc[] = diffData($item, $firstData, $secondData);
         return $acc;
     }, []);
 
-    // print_r($ast);die;
     return $ast;
 }
 
 function diffData($item, $data1, $data2)
 {
-    // var_dump($item);
-    // var_dump($data1);
-    // var_dump($data2);die;
     if (!array_key_exists($item, $data1)) {
-        // print_r($item);die;
         return [
             'key' => $item,
             'type' => 'added',
