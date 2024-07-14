@@ -2,27 +2,26 @@
 
 namespace Differ\Differ;
 
+use function Funct\Collection\sortBy;
 use function Differ\Parsers\parse;
 use function Differ\Formatters\format;
 
-function readFile(string $filePath)
+function readFile(string $filePath): string
 {
-    $path = realpath($filePath);
-
-    if (!file_exists($path)) {
+    if (!file_exists($filePath)) {
         throw new \Exception("The file {$filePath} does not exists.\n");
     }
 
-    return file_get_contents($path);
+    return (string) file_get_contents($filePath);
 }
 
-function getData($path)
+function getData(string $path): object
 {
     $type = pathinfo($path, PATHINFO_EXTENSION);
     return parse(readFile($path), $type);
 }
 
-function genDiff(string $firstFilePath, string $secondFilePath, $format = 'stylish')
+function genDiff(string $firstFilePath, string $secondFilePath, string $format = 'stylish'): string
 {
     $firstData = getData($firstFilePath);
     $secondData = getData($secondFilePath);
@@ -31,23 +30,22 @@ function genDiff(string $firstFilePath, string $secondFilePath, $format = 'styli
     return format($ast, $format);
 }
 
-function genAst($firstData, $secondData)
+function genAst(object $firstData, object $secondData): array
 {
-    $firstData = (array) $firstData;
-    $secondData = (array) $secondData;
+    $firstDataArray = (array) $firstData;
+    $secondDataArray = (array) $secondData;
 
-    $union = array_keys(array_merge($firstData, $secondData));
-    sort($union);
+    $unionKeys = array_keys(array_merge($firstDataArray, $secondDataArray));
+    $sortedKeys = array_values(sortBy($unionKeys, fn($key) => $key));
 
-    $ast = array_reduce($union, function ($acc, $item) use ($firstData, $secondData) {
-        $acc[] = diffData($item, $firstData, $secondData);
-        return $acc;
+    $ast = array_reduce($sortedKeys, function ($acc, $item) use ($firstDataArray, $secondDataArray): array {
+        return[...$acc, diffData($item, $firstDataArray, $secondDataArray)];
     }, []);
 
     return $ast;
 }
 
-function diffData($item, $data1, $data2)
+function diffData(string $item, array $data1, array $data2): array
 {
     if (!array_key_exists($item, $data1)) {
         return [

@@ -2,41 +2,34 @@
 
 namespace Differ\Formatters\plain;
 
-function plain($data, $propertyValue)
+function plain(array $data, string $propertyValue): string
 {
-    $result = array_reduce($data, function ($acc, $node) use ($propertyValue) {
+    $result = array_reduce($data, function ($acc, $node) use ($propertyValue): array {
         $type = $node['type'];
         $key = $node['key'];
         $property = "{$propertyValue}{$key}";
         switch ($type) {
             case 'complex':
-                $acc[] = plain($node['children'], "{$property}.");
-                break;
+                return [...$acc, plain($node['children'], "{$property}.")];
             case 'added':
                 $formattedNewValue = prepareValue($node['newValue']);
-                $acc[] = "Property '{$property}' was added with value: {$formattedNewValue}";
-                break;
+                return [...$acc, "Property '{$property}' was added with value: {$formattedNewValue}"];
             case 'removed':
-                $formattedOldValue = prepareValue($node['newValue']);
-                $acc[] = "Property '{$property}' was removed";
-                break;
+                return [...$acc, "Property '{$property}' was removed"];
             case 'not updated':
-                $acc[] = [];
-                break;
+                return [...$acc, []];
             case 'updated':
                 $formattedOldValue = prepareValue($node['oldValue']);
                 $formattedNewValue = prepareValue($node['newValue']);
-                $acc[] = "Property '{$property}' was updated. From {$formattedOldValue} to {$formattedNewValue}";
-                break;
+                return [...$acc, "Property '{$property}' was updated. From {$formattedOldValue} to {$formattedNewValue}"];
             default:
                 throw new \Exception("Invalid {$type}.");
         };
-        return $acc;
     }, []);
     return implode("\n", arrayFlatten($result));
 }
 
-function prepareValue($value)
+function prepareValue($value): string
 {
     if (is_bool($value)) {
         return $value ? 'true' : 'false';
@@ -54,24 +47,20 @@ function prepareValue($value)
         return "'{$value}'";
     }
 
-    return $value;
+    return "{$value}";
 }
 
-function format($data)
+function format(array $data): string
 {
     return plain($data, "");
 }
 
-function arrayFlatten($tree, $depth = 0)
+function arrayFlatten(array $items): array
 {
-    $result = [];
-    foreach ($tree as $key => $value) {
-        if ($depth >= 0 && is_array($value)) {
-            $value = arrayFlatten($value, $depth > 1 ? $depth - 1 : 0 - $depth);
-            $result = array_merge($result, $value);
-        } else {
-            $result[] = $value;
-        }
-    }
-    return $result;
+    return array_reduce($items, function ($acc, $item): array {
+        if (is_array($item)) {
+            return [...$acc, ...arrayFlatten($item)];
+        };
+        return [...$acc, $item];
+    }, []);
 }
