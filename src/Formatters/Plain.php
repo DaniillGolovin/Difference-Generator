@@ -2,30 +2,34 @@
 
 namespace Differ\Formatters\Plain;
 
-function generatePlain(array $data, string $origin): string
+use function Funct\Collection\flattenAll;
+
+function generatePlain(array $data): string
 {
-    $diffPlane = array_reduce($data, function ($acc, $node) use ($origin): array {
-        [$type, $key] = [$node['type'], $node['key']];
-        $property = "{$origin}{$key}";
-        switch ($type) {
-            case 'complex':
-                return [...$acc, generatePlain($node['children'], "{$property}.")];
-            case 'added':
-                $formattedNewValue = prepareValue($node['newValue']);
-                return [...$acc, "Property '{$property}' was added with value: {$formattedNewValue}"];
-            case 'removed':
-                return [...$acc, "Property '{$property}' was removed"];
-            case 'unchanged':
-                return [...$acc, []];
-            case 'updated':
-                $formattedOldValue = prepareValue($node['oldValue']);
-                $formattedNewValue = prepareValue($node['newValue']);
-                return [...$acc, "Property '{$property}' was updated. From {$formattedOldValue} to {$formattedNewValue}"];
-            default:
-                throw new \Exception("This type: {$type} is not supported.");
-        };
-    }, []);
-    return implode("\n", arrayFlatten($diffPlane));
+    $diffPlain = function ($data, $origin) use (&$diffPlain): array {
+        return array_map(function ($node) use ($origin, $diffPlain) {
+            $type = $node['type'];
+            $pathToProperty = "{$origin}{$node['key']}";
+            switch ($type) {
+                case 'complex':
+                    return $diffPlain($node['children'], "{$pathToProperty}.");
+                case 'added':
+                    $formattedNewValue = prepareValue($node['newValue']);
+                    return "Property '{$pathToProperty}' was added with value: {$formattedNewValue}";
+                case 'removed':
+                    return "Property '{$pathToProperty}' was removed";
+                case 'unchanged':
+                    return [];
+                case 'updated':
+                    $formattedOldValue = prepareValue($node['oldValue']);
+                    $formattedNewValue = prepareValue($node['newValue']);
+                    return "Property '{$pathToProperty}' was updated. From {$formattedOldValue} to {$formattedNewValue}";
+                default:
+                    throw new \Exception("This type: {$type} is not supported.");
+            }
+        }, $data);
+    };
+    return implode("\n", flattenAll($diffPlain($data, "")));
 }
 
 function prepareValue($value): string
@@ -51,15 +55,5 @@ function prepareValue($value): string
 
 function format(array $data): string
 {
-    return generatePlain($data, "");
-}
-
-function arrayFlatten(array $items): array
-{
-    return array_reduce($items, function ($acc, $item): array {
-        if (is_array($item)) {
-            return [...$acc, ...arrayFlatten($item)];
-        };
-        return [...$acc, $item];
-    }, []);
+    return generatePlain($data);
 }
