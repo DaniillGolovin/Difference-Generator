@@ -42,7 +42,7 @@ function format(array $diff): string
             };
         }, $diff);
     };
-    return implode("\n", flattenAll(['{', $iter($diff, 1), '}']));
+    return implode("\n", flattenAll(['{', $iter($diff, 1), '}'])) . "\n";
 }
 
 function prepareValue($value, int $depth): string

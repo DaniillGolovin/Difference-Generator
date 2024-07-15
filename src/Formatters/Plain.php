@@ -37,7 +37,7 @@ function format(array $diff): string
             }
         }, $diff);
     };
-    return implode("\n", flattenAll($iter($diff, [])));
+    return implode("\n", flattenAll($iter($diff, []))) . "\n";
 }
 
 function prepareValue($value): string
